@@ -1,7 +1,7 @@
-const Response = require("./Response");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { User: UserModel } = require("../models");
+const Response = require('./Response');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { User: UserModel } = require('../models');
 
 class Auth extends Response {
   createProfile = async (req, res) => {
@@ -23,7 +23,7 @@ class Auth extends Response {
 
       if (user) {
         return this.sendResponse(res, {
-          message: "User with same email already exist",
+          message: 'User with same email already exist',
           data: {
             user: email,
           },
@@ -55,10 +55,10 @@ class Auth extends Response {
       const token = jwt.sign(
         { userName: newUser.userName, email: newUser.email },
         process.env.SECRET_KEY,
-        { expiresIn: "1h" }
+        { expiresIn: '1h' }
       );
       return this.sendResponse(res, {
-        message: "User Added successfully",
+        message: 'User Added successfully',
         data: {
           user: newUser,
           token,
@@ -67,7 +67,7 @@ class Auth extends Response {
       });
     } catch (err) {
       return this.sendResponse(res, {
-        message: "User Not Added!",
+        message: 'User Not Added!',
         data: err,
         status: 500,
       });
@@ -83,31 +83,31 @@ class Auth extends Response {
 
       if (user === null) {
         return this.sendResponse(res, {
-          message: "Email not found",
+          message: 'Email not found',
           status: 404,
         });
       } else if (email === user.email && passwordMatch) {
         const token = jwt.sign(
           { email: email, id: user._id },
           process.env.SECRET_KEY,
-          { expiresIn: "10m" }
+          { expiresIn: '10m' }
         );
 
         return this.sendResponse(res, {
-          message: "logged IN",
+          message: 'logged IN',
           data: { token, user },
           status: 202,
         });
       } else {
         return this.sendResponse(res, {
-          message: "check your email and password",
+          message: 'check your email and password',
           data: { token, user },
           status: 401,
         });
       }
     } catch (err) {
       return this.sendResponse(res, {
-        message: "Internal server error!",
+        message: 'Internal server error!',
         data: err,
         status: 500,
       });
@@ -121,20 +121,24 @@ class Auth extends Response {
         message: 'No token provided!',
       });
     }
-  
-    const userDecoded= jwt.verify(getToken, process.env.SECRET_KEY, (err, decoded) => {
-      if (err) {
-        return res.status(401).json({
-          message: 'Failed to authenticate token!',
-        });
+
+    const userDecoded = jwt.verify(
+      getToken,
+      process.env.SECRET_KEY,
+      (err, decoded) => {
+        if (err) {
+          return res.status(401).json({
+            message: 'Failed to authenticate token!',
+          });
+        }
+        return decoded;
       }
-      return decoded;
-    });
+    );
 
     const token = jwt.sign(
       { email: userDecoded.email, id: userDecoded.id },
       process.env.SECRET_KEY,
-      { expiresIn: "10m" }
+      { expiresIn: '10m' }
     );
 
     return this.sendResponse(res, {
