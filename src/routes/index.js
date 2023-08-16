@@ -9,4 +9,5 @@ router.use('/users', users);
 router.use('/chat', chat);
 router.use('/posts', posts);
 
+
 module.exports = { router };
