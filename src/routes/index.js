@@ -7,4 +7,4 @@ router.use('/auths', auths);
 router.use('/users', users);
 router.use('/posts', posts);
 
-module.exports = router 
+module.exports = {router} 
