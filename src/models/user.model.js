@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema(
   {
@@ -53,10 +53,10 @@ const userSchema = mongoose.Schema(
       },
     },
     followers: {
-      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     },
     followings: {
-      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     },
   },
   {
@@ -64,6 +64,6 @@ const userSchema = mongoose.Schema(
   }
 );
 
-const User = new mongoose.model("User", userSchema);
+const User = new mongoose.model('User', userSchema);
 
 module.exports = { User };
