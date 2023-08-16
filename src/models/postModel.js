@@ -2,7 +2,8 @@ const mongoose= require('mongoose');
 
 const postSchema= mongoose.Schema({
     mediaUrls:{
-        type:String
+        public_id:String,
+        url:String
     },
     text:{
         type:String
