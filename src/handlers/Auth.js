@@ -66,6 +66,7 @@ class Auth extends Response {
         status: 201,
       });
     } catch (err) {
+      console.log(err)
       return this.sendResponse(res, {
         message: 'User Not Added!',
         data: err,
@@ -77,11 +78,14 @@ class Auth extends Response {
   login = async (req, res) => {
     try {
       const { email, password } = req.body;
-
       const user = await UserModel.findOne({ email: email });
-      const passwordMatch = await bcrypt.compare(password, user.password);
+      let passwordMatch;
 
-      if (user === null) {
+      if (user) {
+        passwordMatch = await bcrypt.compare(password, user.password);
+        console.log(passwordMatch, password, user.password);
+      }
+      if (!user) {
         return this.sendResponse(res, {
           message: 'Email not found',
           status: 404,
@@ -101,11 +105,11 @@ class Auth extends Response {
       } else {
         return this.sendResponse(res, {
           message: 'check your email and password',
-          data: { token, user },
           status: 401,
         });
       }
     } catch (err) {
+      console.log(err);
       return this.sendResponse(res, {
         message: 'Internal server error!',
         data: err,
