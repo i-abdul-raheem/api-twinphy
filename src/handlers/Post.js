@@ -55,12 +55,12 @@ class Post extends Response {
       const newPostData = req.body;
       const newPost = new PostModel(newPostData);
       await newPost.save();
-      console.log(newPost)
+     
       if(newPost){
       return this.sendResponse(res, "Post Created!", newPost, 201);
       }
     } catch (error) {
-      console.error("Error creating post:", error);
+      
       return this.sendResponse(
         res,
         "An error occurred while creating the post.",
