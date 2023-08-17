@@ -1,12 +1,14 @@
-const router = require('express').Router();
-const { auths } = require('./auth');
-const { users } = require('./user');
-const { posts } = require('./posts');
-const chat = require('./chat');
+const router = require("express").Router();
+const { auths } = require("./auth");
+const { users } = require("./user");
+const { posts } = require("./posts");
+const chat = require("./chat");
+const upload = require("./file");
 
-router.use('/auths', auths);
-router.use('/users', users);
-router.use('/posts', posts);
-router.use('/chat', chat);
+router.use("/auths", auths);
+router.use("/users", users);
+router.use("/posts", posts);
+router.use("/chat", chat);
+router.use("/upload", upload);
 
 module.exports = { router };

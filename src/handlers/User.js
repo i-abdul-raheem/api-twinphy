@@ -1,7 +1,7 @@
-const Response = require('./Response');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { User: UserModel } = require('../models');
+const Response = require("./Response");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { User: UserModel } = require("../models");
 
 class User extends Response {
   getUser = async (req, res) => {
@@ -12,13 +12,13 @@ class User extends Response {
 
         if (!userData) {
           return this.sendResponse(res, {
-            message: 'No Users found',
+            message: "No Users found",
             status: 404,
           });
         }
 
         return this.sendResponse(res, {
-          message: 'List of users',
+          message: "List of users",
           data: { userData },
           status: 200,
         });
@@ -28,19 +28,19 @@ class User extends Response {
 
       if (!userData) {
         return this.sendResponse(res, {
-          message: 'User not found',
+          message: "User not found",
           status: 404,
         });
       }
 
       return this.sendResponse(res, {
-        message: 'Current User',
+        message: "Current User",
         data: { userData },
         status: 200,
       });
     } catch (err) {
       return this.sendResponse(res, {
-        message: 'Internal server error!',
+        message: "Internal server error!",
         data: err,
         status: 500,
       });
@@ -51,27 +51,34 @@ class User extends Response {
     try {
       const userId = req.params.id;
       const updatedData = req.body;
-      const hashedPassword = await bcrypt.hash(updatedData.password, 10);
-      updatedData['password'] = hashedPassword;
+
+      if (updatedData.password) {
+        const hashedPassword = await bcrypt.hash(updatedData.password, 10);
+        updatedData["password"] = hashedPassword;
+      }
+      // prevent from upadting email
+      if (updatedData.email) {
+        delete updatedData.email;
+      }
 
       const user = await UserModel.findOne({ _id: userId });
 
       if (!user) {
         return this.sendResponse(res, {
-          message: 'User not found',
+          message: "User not found",
           status: 404,
         });
       }
 
       await UserModel.updateOne({ _id: userId }, { $set: updatedData });
       return this.sendResponse(res, {
-        message: 'User Updated successfully',
+        message: "User Updated successfully",
         data: { user },
         status: 202,
       });
     } catch (err) {
       return this.sendResponse(res, {
-        message: 'Internal server error!',
+        message: "Internal server error!",
         data: err,
         status: 500,
       });
@@ -87,7 +94,7 @@ class User extends Response {
 
       if (!user) {
         return this.sendResponse(res, {
-          message: 'User not found',
+          message: "User not found",
           status: 404,
         });
       }
@@ -104,13 +111,13 @@ class User extends Response {
         { $set: { isActive: isActive } }
       );
       return this.sendResponse(res, {
-        message: 'User Updated successfully',
+        message: "User Updated successfully",
         data: { user },
         status: 202,
       });
     } catch (err) {
       return this.sendResponse(res, {
-        message: 'Internal server error!',
+        message: "Internal server error!",
         data: err,
         status: 500,
       });
@@ -125,19 +132,19 @@ class User extends Response {
 
       if (result.deletedCount === 0) {
         return this.sendResponse(res, {
-          message: 'User not found',
+          message: "User not found",
           status: 404,
         });
       }
 
       return this.sendResponse(res, {
-        message: 'User Removed successfully',
+        message: "User Removed successfully",
         data: { userData },
         status: 202,
       });
     } catch (err) {
       return this.sendResponse(res, {
-        message: 'Internal server error!',
+        message: "Internal server error!",
         data: err,
         status: 500,
       });
