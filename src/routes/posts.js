@@ -4,7 +4,7 @@ const {Post}=require('../handlers/Post');
 
 const handler= new Post();
 router.get('/', handler.getAllPosts);
-router.get('/:id', handler.getPostById);
+
 router.delete('/:id', handler.deletePostById);
 router.post('/', handler.createPost);
 module.exports={posts: router};

@@ -1,38 +1,55 @@
-// const postModel = require("../models/postModel");
+
 const Response = require("./Response");
 const { Post: PostModel } = require("../models/postModel");
 const mongoose = require("mongoose");
+const AWS= require('aws-sdk');
 
 class Post extends Response {
   getAllPosts = async (req, res) => {
     try {
-      console.log("i am in");
-      const posts = await PostModel.find({});
-
-      if (posts.length < 1) {
-        return this.sendResponse(res, "No posts found", null);
+      const postId = req.query.id;
+      if (!postId) {
+        const posts = await PostModel.find({});
+        
+        if (!posts || posts.length === 0) {
+          return this.sendResponse(res, {
+            message: 'No Posts found',
+            status: 404,
+          });
+        }
+  
+        return this.sendResponse(res, {
+          message: 'List of posts',
+          data: { posts },
+          status: 200,
+        });
       }
-      res.json(posts);
+  
+      const postById = await PostModel.find({ _id: postId });
+  
+      if (!postById || postById.length === 0) {
+        return this.sendResponse(res, {
+          message: 'Post not found',
+          status: 404,
+        });
+      }
+  
+      return this.sendResponse(res, {
+        message: 'Current Post',
+        data: { postById },
+        status: 200,
+      });
     } catch (err) {
-      return this.sendResponse(res, "Internal Server Error", err, 500);
+      return this.sendResponse(res, {
+        message: 'Internal server error!',
+        data: err,
+        status: 500,
+      });
     }
   };
+  
 
-  getPostById = async (req, res) => {
-    try {
-      const postId = req.params.id;
-
-      const post = await PostModel.findById(postId);
-
-      if (!post) {
-        return this.sendResponse(res, "Post not found", null, 404);
-      }
-
-      res.json(post);
-    } catch (err) {
-      return this.sendResponse(res, "Internal Server Error", null, 500);
-    }
-  };
+ 
 
   deletePostById = async (req, res) => {
     try {
@@ -53,6 +70,10 @@ class Post extends Response {
   createPost = async (req, res) => {
     try {
       const newPostData = req.body;
+     
+      const{file}= req.body.mediaUrls;
+      console.log(req.body)
+      console.log(file);
       const newPost = new PostModel(newPostData);
       await newPost.save();
      
