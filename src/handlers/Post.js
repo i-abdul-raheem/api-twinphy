@@ -58,12 +58,12 @@ class Post extends Response {
       const deletedPost = await PostModel.findByIdAndDelete(postId);
 
       if (!deletedPost) {
-        return this.sendResponse(res, "Post not found", null, 404);
+        return this.sendResponse(res, {message:"Post not found", status: 404});
       }
 
       res.json({ message: "Post deleted successfully" });
     } catch (err) {
-      return this.sendResponse(res, "Internal Server Error", null, 500);
+      return this.sendResponse(res, {message:"Internal Server Error", status: 500});
     }
   };
 
@@ -75,21 +75,19 @@ class Post extends Response {
       console.log(req.body)
       console.log(file);
       const newPost = new PostModel(newPostData);
-      await newPost.save();
-     
-      if(newPost){
-      return this.sendResponse(res, "Post Created!", newPost, 201);
+      const savedPost = await newPost.save();
+      console.log("Saved Post:", savedPost);
+  
+      if (savedPost) {
+        return this.sendResponse(res, { message: "Post Created!", status: 201 });
       }
     } catch (error) {
-      
-      return this.sendResponse(
-        res,
-        "An error occurred while creating the post.",
-        null,
-        500
-      );
+      console.error("Error creating post:", error);
+
     }
   };
+  
+  
 }
 
 module.exports = { Post };
