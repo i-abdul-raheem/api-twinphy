@@ -55,7 +55,7 @@ class Auth extends Response {
       const token = jwt.sign(
         { userName: newUser.userName, email: newUser.email },
         process.env.SECRET_KEY,
-        { expiresIn: "1h" }
+        { expiresIn: "10m" }
       );
       return this.sendResponse(res, {
         message: "User Added successfully",
