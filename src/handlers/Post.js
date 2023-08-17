@@ -70,22 +70,38 @@ class Post extends Response {
   createPost = async (req, res) => {
     try {
       const newPostData = req.body;
-     
-      const{file}= req.body.mediaUrls;
-      console.log(req.body)
-      console.log(file);
-      const newPost = new PostModel(newPostData);
-      const savedPost = await newPost.save();
-      console.log("Saved Post:", savedPost);
+      const { text, user_id } = newPostData;
+      let mediaUrls = {};
   
-      if (savedPost) {
-        return this.sendResponse(res, { message: "Post Created!", status: 201 });
+      if (req.file) {
+        
+        const file = req.file;
+        console.log(file)
+        const params = {
+          Bucket: 'twinphy-v2',
+          Key: `uploads/${Date.now()}-${file.originalname}`,
+          Body: file.buffer,
+        };
+  
+        const s3Response = await s3.upload(params).promise();
+        mediaUrls = {
+          public_id: s3Response.Key,
+          url: s3Response.Location,
+        };
       }
+  
+    
+      const newPost = new PostModel({ text, user_id, mediaUrls });
+      const savedPost = await newPost.save();
+  
+      return this.sendResponse(res, { message: "Post Created!", status: 201 });
     } catch (error) {
       console.error("Error creating post:", error);
-
+      return this.sendResponse(res, { message: "An error occurred while creating the post.", status: 500 });
     }
   };
+  
+  
   
   
 }
