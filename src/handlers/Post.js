@@ -12,7 +12,7 @@ class Post extends Response {
 
       if (!postId) {
         // Fetch all posts
-        result = await PostModel.find({}).populate("user_id");
+        result = await PostModel.find({}).sort({ updatedAt: -1 }).populate("user_id");
       } else {
         // Fetch a single post by ID
         result = await PostModel.findOne({ _id: postId });
