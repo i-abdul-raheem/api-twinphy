@@ -37,10 +37,6 @@ app.listen(PORT, () => {
   });
 });
 
-app.get("/", (req, res) => {
-  res.send("Home Page");
-});
-
 // Initiate Google authentication
 app.get(
   "/auth/google",
