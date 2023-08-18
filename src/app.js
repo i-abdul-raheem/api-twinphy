@@ -3,11 +3,10 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const { router } = require("./routes/index");
-const fileUpload = require("express-fileupload");
 const { db } = require("./db");
 const PORT = process.env.PORT || 5001;
 
-app.use(fileUpload());
+
 app.use(cors());
 app.use(express.json());
 

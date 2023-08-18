@@ -2,19 +2,21 @@ const mongoose= require('mongoose');
 
 const postSchema= mongoose.Schema({
     mediaUrls:{
-        public_id:{
-            type:String
-        },
-        url:{
-            type:String
-        }
+       type:String
     },
     text:{
         type:String
     },
     user_id:{
-        type :String
-    }
+        type :mongoose.Schema.Types.ObjectId,
+        ref:'User'
+    },
+    // shared_id:{
+    //     type:[{
+    //         type:mongoose.Schema.Types.ObjectId,
+    //         ref:'User'
+    //     }]
+    // }
 }, {timestamps:true})
 
 const Post = mongoose.model('Post', postSchema);
