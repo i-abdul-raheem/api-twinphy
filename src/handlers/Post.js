@@ -31,13 +31,41 @@ class Post extends Response {
         .json({ message: "Internal server error", data: err, status: 500 });
     }
   };
-
   getPostByUSerId = async (req, res) => {
-    const userId = req.params.id;
-    if (!userId) {
-      return this.sendResponse(res, { message: "Post Not found", status: 404 });
+    try {
+      const userId = req.params.id;
+
+      if (!userId) {
+        return this.sendResponse(res, {
+          message: "User ID not provided",
+          status: 400,
+        });
+      }
+
+      const posts = await PostModel.find({ user_id: userId });
+
+      if (!posts || posts.length === 0) {
+        return this.sendResponse(res, {
+          message: "No posts found for the user",
+          status: 404,
+        });
+      }
+
+      return this.sendResponse(res, {
+        message: "Posts retrieved successfully",
+        data: posts,
+        status: 200,
+      });
+    } catch (err) {
+      console.error("Error fetching posts:", err);
+      return this.sendResponse(res, {
+        message: "Error fetching posts",
+        data: err,
+        status: 500,
+      });
     }
   };
+
   getPostForUser = async (req, res) => {
     try {
       const userId = req.user.id;
@@ -83,14 +111,13 @@ class Post extends Response {
     }
   };
 
-
   createPost = async (req, res) => {
     try {
-      const { mediaUrls, text, userId } = req.body;
-      
-     
-      const user = await User.findOne({ _id: userId });
-     
+      const { mediaUrls, text, id } = req.body;
+
+      console.log(id);
+      const user = await User.findOne({ _id: id });
+
       const newPost = new PostModel({
         mediaUrls,
         text,
