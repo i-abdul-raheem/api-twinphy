@@ -83,36 +83,6 @@ class Post extends Response {
     }
   };
 
- 
-
-  // createPost = async (req, res) => {
-  //   try {
-  //     const { mediaUrls, text } = req.body;
-  //     const userId = req.params.id;
-  //     console.log(userId);
-  //     const user = await User.findOne({ _id: userId });
-  //     console.log(user);
-  //     const newPost = new PostModel({
-  //       mediaUrls,
-  //       text,
-  //       user_id: user._id,
-  //     });
-
-  //     await newPost.save();
-  //     console.log(newPost);
-  //     return this.sendResponse(res, {
-  //       message: "Post Added successfully",
-  //       data: newPost,
-  //       status: 201,
-  //     });
-  //   } catch (err) {
-  //     return this.sendResponse(res, {
-  //       message: "Post Not Added!",
-  //       data: err,
-  //       status: 500,
-  //     });
-  //   }
-  // };
 
   createPost = async (req, res) => {
     try {
@@ -120,7 +90,7 @@ class Post extends Response {
       
      
       const user = await User.findOne({ _id: userId });
-      console.log(user);
+     
       const newPost = new PostModel({
         mediaUrls,
         text,
