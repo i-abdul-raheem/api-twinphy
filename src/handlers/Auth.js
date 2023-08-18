@@ -18,7 +18,7 @@ class Auth extends Response {
         city,
         country,
       } = req.body;
-      
+
       const user = await UserModel.findOne({ email });
 
       if (user) {
@@ -77,20 +77,23 @@ class Auth extends Response {
 
   login = async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { email, password, login_type } = req.body;
       const user = await UserModel.findOne({ email: email });
       let passwordMatch;
-
       if (user) {
-        passwordMatch = await bcrypt.compare(password, user.password);
-        console.log(passwordMatch, password, user.password);
+        if (password) {
+          passwordMatch = await bcrypt.compare(password, user.password);
+        }
       }
       if (!user) {
         return this.sendResponse(res, {
           message: "Email not found",
           status: 404,
         });
-      } else if (email === user.email && passwordMatch) {
+      } else if (
+        email === user.email &&
+        (passwordMatch || login_type === "google")
+      ) {
         const token = jwt.sign(
           { email: email, id: user._id },
           process.env.SECRET_KEY,
