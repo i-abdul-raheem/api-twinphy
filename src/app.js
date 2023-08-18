@@ -4,9 +4,10 @@ const passport = require("passport");
 const session = require("express-session");
 const passportSetup = require("./handlers/Passport");
 const app = express();
-const cors = require("cors");
-const { router } = require("./routes/index");
-const { db } = require("./db");
+const cors = require('cors');
+const { router } = require('./routes/index');
+const { db } = require('./db');
+const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
 
 app.use(cookieParser());
@@ -14,10 +15,10 @@ app.use(cookieParser());
 app.use(
   session({ secret: "hamza12345", resave: true, saveUninitialized: true })
 );
-
 app.use(express.json());
 const PORT = process.env.PORT || 5001;
 
+app.use(fileUpload());
 app.use(passport.initialize());
 app.use(passport.session());
 
