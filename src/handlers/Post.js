@@ -9,7 +9,7 @@ class Post extends Response {
     try {
       const postId = req.params.id;
       let result;
-
+ console.log(object)
       if (!postId) {
         // Fetch all posts
         result = await PostModel.find({}).sort({ updatedAt: -1 }).populate("user_id");
