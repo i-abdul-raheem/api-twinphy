@@ -11,12 +11,7 @@ const postSchema= mongoose.Schema({
         type :mongoose.Schema.Types.ObjectId,
         ref:'User'
     },
-    // shared_id:{
-    //     type:[{
-    //         type:mongoose.Schema.Types.ObjectId,
-    //         ref:'User'
-    //     }]
-    // }
+   
 }, {timestamps:true})
 
 const Post = mongoose.model('Post', postSchema);

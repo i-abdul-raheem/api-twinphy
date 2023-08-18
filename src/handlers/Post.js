@@ -83,42 +83,42 @@ class Post extends Response {
     }
   };
 
+ 
+
   // createPost = async (req, res) => {
   //   try {
-  //     const newPostData = req.body;
-  //     const { text, user_id } = newPostData;
-  //     let mediaUrls = null; // Initialize mediaUrls as null
+  //     const { mediaUrls, text } = req.body;
+  //     const userId = req.params.id;
+  //     console.log(userId);
+  //     const user = await User.findOne({ _id: userId });
+  //     console.log(user);
+  //     const newPost = new PostModel({
+  //       mediaUrls,
+  //       text,
+  //       user_id: user._id,
+  //     });
 
-  //     if (req.file) {
-  //       const file = req.file;
-  //       const params = {
-  //         Bucket: 'twinphy-v2',
-  //         Key: `uploads/${Date.now()}-${file.originalname}`,
-  //         Body: file.buffer,
-  //       };
-
-  //       const s3Response = await s3.upload(params).promise();
-  //       mediaUrls = {  // Set mediaUrls as an object if file is uploaded
-  //         public_id: s3Response.Key,
-  //         url: s3Response.Location,
-  //       };
-  //     }
-
-  //     const newPost = new PostModel({ text, user_id, mediaUrls });
-  //     const savedPost = await newPost.save();
-
-  //     return this.sendResponse(res, { message: "Post Created!", status: 201 });
-  //   } catch (error) {
-  //     console.error("Error creating post:", error);
-  //     return this.sendResponse(res, { message: "An error occurred while creating the post.", status: 500 });
+  //     await newPost.save();
+  //     console.log(newPost);
+  //     return this.sendResponse(res, {
+  //       message: "Post Added successfully",
+  //       data: newPost,
+  //       status: 201,
+  //     });
+  //   } catch (err) {
+  //     return this.sendResponse(res, {
+  //       message: "Post Not Added!",
+  //       data: err,
+  //       status: 500,
+  //     });
   //   }
   // };
 
   createPost = async (req, res) => {
     try {
-      const { mediaUrls, text } = req.body;
-      const userId = req.params.id;
-      console.log(userId);
+      const { mediaUrls, text, userId } = req.body;
+      
+     
       const user = await User.findOne({ _id: userId });
       console.log(user);
       const newPost = new PostModel({
@@ -142,29 +142,6 @@ class Post extends Response {
       });
     }
   };
-
-  // createPost = async (req, res) => {
-  //   try {
-  //     const { mediaUrls, text } = req.body;
-  //     const user_id = req.user.id; // Assuming user's ID is available in req.user
-
-  //     const newPost = new PostModel({
-  //       mediaUrls,
-  //       text,
-  //       user_id,
-  //     });
-
-  //     const savedPost = await newPost.save();
-
-  //     if (savedPost) {
-  //       return this.sendResponse(res, { message: "Post Created!", status: 201 });
-
-  //     }
-  //   } catch (error) {
-  //     return this.sendResponse(res, { message: "An error occurred while creating the post.", status: 500 });
-
-  //   }
-  // };
 }
 
 module.exports = { Post };
