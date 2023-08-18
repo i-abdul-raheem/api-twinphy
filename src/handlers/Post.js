@@ -86,10 +86,10 @@ class Post extends Response {
 
   createPost = async (req, res) => {
     try {
-      const { mediaUrls, text, userId } = req.body;
+      const { mediaUrls, text, id } = req.body;
       
-     
-      const user = await User.findOne({ _id: userId });
+     console.log(id)
+      const user = await User.findOne({ _id: id });
      
       const newPost = new PostModel({
         mediaUrls,
