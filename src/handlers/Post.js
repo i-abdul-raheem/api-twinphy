@@ -1,55 +1,65 @@
-
 const Response = require("./Response");
-const { Post: PostModel } = require("../models/postModel");
+const { User } = require("../models");
 const mongoose = require("mongoose");
-const AWS= require('aws-sdk');
+const { Post: PostModel } = require("../models/postModel");
+const AWS = require("aws-sdk");
 
 class Post extends Response {
   getAllPosts = async (req, res) => {
     try {
-      const postId = req.query.id;
+      const postId = req.params.id;
+      let result;
+
       if (!postId) {
-        const posts = await PostModel.find({});
-        
-        if (!posts || posts.length === 0) {
-          return this.sendResponse(res, {
-            message: 'No Posts found',
-            status: 404,
-          });
-        }
-  
-        return this.sendResponse(res, {
-          message: 'List of posts',
-          data: { posts },
-          status: 200,
-        });
+        // Fetch all posts
+        result = await PostModel.find({}).populate("user_id");
+      } else {
+        // Fetch a single post by ID
+        result = await PostModel.findOne({ _id: postId });
       }
-  
-      const postById = await PostModel.find({ _id: postId });
-  
-      if (!postById || postById.length === 0) {
-        return this.sendResponse(res, {
-          message: 'Post not found',
-          status: 404,
-        });
+
+      if (!result) {
+        const message = postId ? "Post not found" : "No posts found";
+        return res.status(404).json({ message, status: 404 });
       }
-  
-      return this.sendResponse(res, {
-        message: 'Current Post',
-        data: { postById },
-        status: 200,
-      });
+
+      const message = postId ? "Post retrieved successfully" : "List of posts";
+      return res.status(200).json({ message, data: result, status: 200 });
     } catch (err) {
-      return this.sendResponse(res, {
-        message: 'Internal server error!',
-        data: err,
-        status: 500,
-      });
+      return res
+        .status(500)
+        .json({ message: "Internal server error", data: err, status: 500 });
     }
   };
-  
 
- 
+  getPostByUSerId = async (req, res) => {
+    const userId = req.params.id;
+    if (!userId) {
+      return this.sendResponse(res, { message: "Post Not found", status: 404 });
+    }
+  };
+  getPostForUser = async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const posts = await PostModel.find({ user_id: userId }).populate(
+        "user_id"
+      );
+
+      if (posts.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No posts found for the user", status: 404 });
+      }
+
+      return res
+        .status(200)
+        .json({ message: "List of posts", data: posts, status: 200 });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "Internal server error", data: err, status: 500 });
+    }
+  };
 
   deletePostById = async (req, res) => {
     try {
@@ -58,52 +68,50 @@ class Post extends Response {
       const deletedPost = await PostModel.findByIdAndDelete(postId);
 
       if (!deletedPost) {
-        return this.sendResponse(res, {message:"Post not found", status: 404});
+        return this.sendResponse(res, {
+          message: "Post not found",
+          status: 404,
+        });
       }
 
       res.json({ message: "Post deleted successfully" });
     } catch (err) {
-      return this.sendResponse(res, {message:"Internal Server Error", status: 500});
+      return this.sendResponse(res, {
+        message: "Internal Server Error",
+        status: 500,
+      });
     }
   };
 
+
   createPost = async (req, res) => {
     try {
-      const newPostData = req.body;
-      const { text, user_id } = newPostData;
-      let mediaUrls = {};
-  
-      if (req.file) {
-        
-        const file = req.file;
-        console.log(file)
-        const params = {
-          Bucket: 'twinphy-v2',
-          Key: `uploads/${Date.now()}-${file.originalname}`,
-          Body: file.buffer,
-        };
-  
-        const s3Response = await s3.upload(params).promise();
-        mediaUrls = {
-          public_id: s3Response.Key,
-          url: s3Response.Location,
-        };
-      }
-  
-    
-      const newPost = new PostModel({ text, user_id, mediaUrls });
-      const savedPost = await newPost.save();
-  
-      return this.sendResponse(res, { message: "Post Created!", status: 201 });
-    } catch (error) {
-      console.error("Error creating post:", error);
-      return this.sendResponse(res, { message: "An error occurred while creating the post.", status: 500 });
+      const { mediaUrls, text, userId } = req.body;
+      
+     
+      const user = await User.findOne({ _id: userId });
+     
+      const newPost = new PostModel({
+        mediaUrls,
+        text,
+        user_id: user._id,
+      });
+
+      await newPost.save();
+      console.log(newPost);
+      return this.sendResponse(res, {
+        message: "Post Added successfully",
+        data: newPost,
+        status: 201,
+      });
+    } catch (err) {
+      return this.sendResponse(res, {
+        message: "Post Not Added!",
+        data: err,
+        status: 500,
+      });
     }
   };
-  
-  
-  
-  
 }
 
 module.exports = { Post };

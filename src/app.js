@@ -7,9 +7,8 @@ const app = express();
 const cors = require("cors");
 const { router } = require("./routes/index");
 const { db } = require("./db");
-const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
-
+const fileUpload = require('express-fileupload');
 app.use(cookieParser());
 // Set up session middleware
 app.use(
