@@ -4,16 +4,16 @@ const passport = require("passport");
 const session = require("express-session");
 const passportSetup = require("./handlers/Passport");
 const app = express();
-const cors = require('cors');
-const { router } = require('./routes/index');
-const { db } = require('./db');
+const cors = require("cors");
+const { router } = require("./routes/index");
+const { db } = require("./db");
 const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
 
 app.use(cookieParser());
 // Set up session middleware
 app.use(
-  session({ secret: "hamza12345", resave: true, saveUninitialized: true })
+  session({ secret: process.env.SESSION_SECRET, resave: true, saveUninitialized: true })
 );
 app.use(express.json());
 const PORT = process.env.PORT || 5001;
@@ -22,13 +22,7 @@ app.use(fileUpload());
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(express.json());
 
 app.use("/api", router);
@@ -60,7 +54,9 @@ app.get(
   (req, res) => {
     if (req.isAuthenticated()) {
       // Set a cookie with user data
-      res.cookie("userData", JSON.stringify(req.user, null, 5), { maxAge: 900000 }); // Set the cookie with a 15-minute expiration
+      res.cookie("userData", JSON.stringify(req.user, null, 5), {
+        maxAge: 900000,
+      }); // Set the cookie with a 15-minute expiration
       res.redirect("http://localhost:3000/");
     } else {
       res.redirect("/login");
