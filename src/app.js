@@ -27,7 +27,7 @@ const options = {
   cert: fs.readFileSync("certificate.pem"),
 };
 
-const PORT_SSL = 443; // HTTPS default port
+const PORT_SSL = process.env.SSL_PORT; // HTTPS default port
 
 app.get("/", (req, res) => {
   res.send("Hello, this is a secure API!");
