@@ -7,9 +7,8 @@ const AWS = require("aws-sdk");
 class Post extends Response {
   getAllPosts = async (req, res) => {
     try {
-      const postId = req.params.id;
+      const postId = req.params?.id;
       let result;
- console.log(object)
       if (!postId) {
         // Fetch all posts
         result = await PostModel.find({}).sort({ updatedAt: -1 }).populate("user_id");
@@ -17,15 +16,14 @@ class Post extends Response {
         // Fetch a single post by ID
         result = await PostModel.findOne({ _id: postId });
       }
-
       if (!result) {
         const message = postId ? "Post not found" : "No posts found";
         return res.status(404).json({ message, status: 404 });
       }
-
       const message = postId ? "Post retrieved successfully" : "List of posts";
       return res.status(200).json({ message, data: result, status: 200 });
     } catch (err) {
+      console.log(err);
       return res
         .status(500)
         .json({ message: "Internal server error", data: err, status: 500 });
