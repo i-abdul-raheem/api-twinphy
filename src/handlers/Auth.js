@@ -122,36 +122,44 @@ class Auth extends Response {
   };
 
   refresh = async (req, res) => {
-    const getToken = req.headers.authorization?.split(" ")[1]; //'Bearer <token>'
-    if (!getToken) {
-      return res.status(403).json({
-        message: "No token provided!",
+    try {
+      const getToken = req.headers.authorization?.split(" ")[1]; //'Bearer <token>'
+      if (!getToken) {
+        return res.status(403).json({
+          message: "No token provided!",
+        });
+      }
+
+      const userDecoded = jwt.verify(
+        getToken,
+        process.env.SECRET_KEY,
+        (err, decoded) => {
+          if (err) {
+            return res.status(401).json({
+              message: "Failed to authenticate token!",
+            });
+          }
+          return decoded;
+        }
+      );
+
+      const token = jwt.sign(
+        { email: userDecoded.email, id: userDecoded.id },
+        process.env.SECRET_KEY,
+        { expiresIn: "10m" }
+      );
+
+      return this.sendResponse(res, {
+        data: { token },
+        status: 202,
+      });
+    } catch (err) {
+      console.log(err);
+      return this.sendResponse(res, {
+        message: "Internal server error",
+        status: 202,
       });
     }
-
-    const userDecoded = jwt.verify(
-      getToken,
-      process.env.SECRET_KEY,
-      (err, decoded) => {
-        if (err) {
-          return res.status(401).json({
-            message: "Failed to authenticate token!",
-          });
-        }
-        return decoded;
-      }
-    );
-
-    const token = jwt.sign(
-      { email: userDecoded.email, id: userDecoded.id },
-      process.env.SECRET_KEY,
-      { expiresIn: "10m" }
-    );
-
-    return this.sendResponse(res, {
-      data: { token },
-      status: 202,
-    });
   };
 }
 

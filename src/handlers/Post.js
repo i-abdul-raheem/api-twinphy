@@ -1,7 +1,7 @@
 const Response = require("./Response");
 const { User } = require("../models");
 const mongoose = require("mongoose");
-const { Post: PostModel } = require("../models/postModel");
+const { Post: PostModel, ReportPost } = require("../models");
 const AWS = require("aws-sdk");
 
 class Post extends Response {
@@ -135,6 +135,53 @@ class Post extends Response {
       return this.sendResponse(res, {
         message: "Post Not Added!",
         data: err,
+        status: 500,
+      });
+    }
+  };
+
+  reportPost = async (req, res) => {
+    try {
+      const { post_id } = req.params;
+      const { description, user_id } = req.body;
+      const post = await PostModel.findById({ _id: post_id });
+      if (!post) {
+        return this.sendResponse(res, {
+          message: "Post not found",
+          status: 404,
+        });
+      }
+
+      const curr = await PostModel.findOne({ _id: post_id });
+      const { reported_by } = curr;
+      reported_by.push(user_id);
+      const alterRepost = await PostModel.updateOne(
+        { _id: post_id },
+        { $set: { reported_by } }
+      );
+      if (alterRepost?.modifiedCount > 0) {
+        const reportPost = new ReportPost({
+          user_id,
+          post_id,
+          description,
+        });
+
+        await reportPost.save();
+
+        return this.sendResponse(res, {
+          message: "Post reported successfully",
+          data: reportPost,
+          status: 200,
+        });
+      }
+      return this.sendResponse(res, {
+        message: "Post reporting was not successfully",
+        data: reportPost,
+        status: 400,
+      });
+    } catch (err) {
+      return this.sendResponse(res, {
+        message: "Internal Server Error",
         status: 500,
       });
     }
