@@ -154,18 +154,32 @@ class Post extends Response {
         });
       }
 
-      const reportPost = new ReportPost({
-        user_id,
-        post_id,
-        description,
-      });
+      const curr = await PostModel.findOne({ _id: post_id });
+      const { reported_by } = curr;
+      reported_by.push(user_id);
+      const alterRepost = await PostModel.updateOne(
+        { _id: post_id },
+        { $set: { reported_by } }
+      );
+      if (alterRepost?.modifiedCount > 0) {
+        const reportPost = new ReportPost({
+          user_id,
+          post_id,
+          description,
+        });
 
-      await reportPost.save();
+        await reportPost.save();
 
+        return this.sendResponse(res, {
+          message: "Post reported successfully",
+          data: reportPost,
+          status: 200,
+        });
+      }
       return this.sendResponse(res, {
-        message: "Post reported successfully",
+        message: "Post reporting was not successfully",
         data: reportPost,
-        status: 200,
+        status: 400,
       });
     } catch (err) {
       return this.sendResponse(res, {
