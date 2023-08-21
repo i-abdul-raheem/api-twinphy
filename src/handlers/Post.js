@@ -1,18 +1,19 @@
 const Response = require("./Response");
 const { User } = require("../models");
 const mongoose = require("mongoose");
-const { Post: PostModel } = require("../models/postModel");
+const { Post: PostModel, ReportPost } = require("../models");
 const AWS = require("aws-sdk");
 
 class Post extends Response {
   getAllPosts = async (req, res) => {
     try {
-      const postId = req.params.id;
+      const postId = req.params?.id;
       let result;
- console.log(object)
       if (!postId) {
         // Fetch all posts
-        result = await PostModel.find({}).sort({ updatedAt: -1 }).populate("user_id");
+        result = await PostModel.find({})
+          .sort({ updatedAt: -1 })
+          .populate("user_id");
       } else {
         // Fetch a single post by ID
         result = await PostModel.findOne({ _id: postId });
@@ -26,6 +27,7 @@ class Post extends Response {
       const message = postId ? "Post retrieved successfully" : "List of posts";
       return res.status(200).json({ message, data: result, status: 200 });
     } catch (err) {
+      console.log(err);
       return res
         .status(500)
         .json({ message: "Internal server error", data: err, status: 500 });
@@ -135,6 +137,39 @@ class Post extends Response {
       return this.sendResponse(res, {
         message: "Post Not Added!",
         data: err,
+        status: 500,
+      });
+    }
+  };
+
+  reportPost = async (req, res) => {
+    try {
+      const { post_id } = req.params;
+      const { description, user_id } = req.body;
+      const post = await PostModel.findById({ _id: post_id });
+      if (!post) {
+        return this.sendResponse(res, {
+          message: "Post not found",
+          status: 404,
+        });
+      }
+
+      const reportPost = new ReportPost({
+        user_id,
+        post_id,
+        description,
+      });
+
+      await reportPost.save();
+
+      return this.sendResponse(res, {
+        message: "Post reported successfully",
+        data: reportPost,
+        status: 200,
+      });
+    } catch (err) {
+      return this.sendResponse(res, {
+        message: "Internal Server Error",
         status: 500,
       });
     }
