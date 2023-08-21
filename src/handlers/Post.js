@@ -18,12 +18,10 @@ class Post extends Response {
         // Fetch a single post by ID
         result = await PostModel.findOne({ _id: postId });
       }
-
       if (!result) {
         const message = postId ? "Post not found" : "No posts found";
         return res.status(404).json({ message, status: 404 });
       }
-
       const message = postId ? "Post retrieved successfully" : "List of posts";
       return res.status(200).json({ message, data: result, status: 200 });
     } catch (err) {

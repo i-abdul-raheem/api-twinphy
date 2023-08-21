@@ -1,6 +1,6 @@
 const { s3 } = require("../handlers/S3");
 const router = require("express").Router();
-
+const {User} = require('../models/user.model')
 router.post("/", (req, res) => {
   const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
   let keyName = uniqueSuffix + req.files.avatar.name;
@@ -24,5 +24,6 @@ router.post("/", (req, res) => {
     }
   );
 });
+
 
 module.exports = router;
