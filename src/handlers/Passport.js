@@ -2,8 +2,8 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const passport = require("passport");
 const url =
   process.env.NODE_ENV === "staging"
-    ? "http://localhost:5000"
-    : "http://13.48.59.123:5001";
+    ? "https://localhost"
+    : "https://13.48.59.123";
 passport.use(
   new GoogleStrategy(
     {
