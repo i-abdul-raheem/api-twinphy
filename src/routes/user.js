@@ -10,6 +10,7 @@ router.patch('/:id', auth, handler.blockUser);
 router.delete('/:id', auth, handler.deleteUser);
 router.patch('/block/:id',auth, handler.restrictUser);
 router.patch('/un-block/:id',auth, handler.unRestrictUser);
+router.patch('/follow/:id', handler.followUser);
 
 module.exports = {
   users: router,

@@ -78,7 +78,7 @@ class Auth extends Response {
   login = async (req, res) => {
     try {
       const { email, password, login_type } = req.body;
-      const user = await UserModel.findOne({ email: email });
+      const user = await UserModel.findOne({ email: email }).populate(["followers", "followings"]);
       let passwordMatch;
       if (user) {
         if (password) {
