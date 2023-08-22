@@ -237,6 +237,94 @@ class User extends Response {
       });
     }
   };
+
+  followUser = async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { follow_user_id } = req.body;
+      console.log(follow_user_id)
+
+      const currentuser = await UserModel.findOne({ _id: userId });
+      const toOtherUser = await UserModel.findOne({ _id: follow_user_id });
+
+      if (!currentuser && !toOtherUser) {
+        return this.sendResponse(res, {
+          message: "User not found",
+          status: 404,
+        });
+      }
+
+      const { followings, _id } = currentuser;
+      const { followers } = toOtherUser;
+
+      if (followings.includes(follow_user_id) && followers.includes(_id)) {
+        const updateFollow = followings.filter(
+          (id) => id.toString() !== follow_user_id
+        );
+        const updateFollower = followers.filter(
+          (id) => id.toString() !== _id.toString()
+        );
+
+        // following
+        await UserModel.updateOne(
+          { _id: userId },
+          { $set: { followings: updateFollow } }
+        );
+
+        // followers
+        await UserModel.updateOne(
+          { _id: follow_user_id },
+          { $set: { followers: updateFollower } }
+        );
+
+        const data = await UserModel.findOne({ _id: userId }).populate([
+          "followings",
+          "followers",
+        ]);
+
+        return this.sendResponse(res, {
+          message: "User unfollow successfully",
+          data: {
+            followings: data.followings,
+            followers: data.followers,
+          },
+          status: 200,
+        });
+      }
+
+      followings.push(follow_user_id);
+      // following
+      await UserModel.updateOne({ _id: userId }, { $set: { followings } });
+
+      followers.push(_id);
+      // followersNew
+      await UserModel.updateOne(
+        { _id: follow_user_id },
+        { $set: { followers } }
+      );
+      
+      const data = await UserModel.findOne({ _id: userId }).populate([
+        "followings",
+        "followers",
+      ]);
+
+      return this.sendResponse(res, {
+        message: "User follow successfully",
+        data: {
+          followings: data.followings,
+          followers: data.followers,
+        },
+        status: 202,
+      });
+    } catch (err) {
+      console.log(err)
+      return this.sendResponse(res, {
+        message: "Internal server error!",
+        data: err,
+        status: 500,
+      });
+    }
+  };
 }
 
 module.exports = {
