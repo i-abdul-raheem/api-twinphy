@@ -115,7 +115,7 @@ class Post extends Response {
     try {
       const { mediaUrls, text, id } = req.body;
 
-      console.log(id);
+      
       const user = await User.findOne({ _id: id });
 
       const newPost = new PostModel({
@@ -232,6 +232,30 @@ class Post extends Response {
       return this.sendResponse(res, { message: "Like not added" });
     }
   };
+  postComments= async (req, res )=>{
+    try{
+      const { text , user_id , post_id}=req.body;
+      const exist = await PostModel.findOne({ _id: post_id });
+      if (!exist) {
+        return this.sendResponse(res, {
+          message: "Post not found",
+          status: 404,
+        });
+        
+      }
+      const update = await PostModel.updateOne(
+        { _id: post_id },
+        { $push: { comments: user_id } }
+      );
+      return this.sendResponse(res, {
+        message: "comment added to post",
+        status: 200,
+      });
+    }
+    catch (err) {
+      return this.sendResponse(res, { message: "Comment not added to post" });
+    }
+  }
 }
 
 module.exports = { Post };

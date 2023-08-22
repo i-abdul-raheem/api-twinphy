@@ -5,10 +5,11 @@ const commentSchema= mongoose.Schema({
     text:{
         type:String
     },
-    media:{
-        type:String
-    },
-    postId:{
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    post_id:{
         type:String
     }
 },{timestamps:true});
