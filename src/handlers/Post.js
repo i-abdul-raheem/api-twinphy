@@ -3,6 +3,14 @@ const { User } = require("../models");
 const mongoose = require("mongoose");
 const { Post: PostModel, ReportPost } = require("../models");
 const AWS = require("aws-sdk");
+const FB = require("facebook-node-sdk");
+const axios = require("axios");
+
+const fb = new FB({
+  appId: process.env.APP_ID,
+  secret: process.env.APP_SECRET,
+});
+fb.setAccessToken(process.env.ACCESS_TOKEN);
 
 class Post extends Response {
   getAllPosts = async (req, res) => {
@@ -182,6 +190,64 @@ class Post extends Response {
     } catch (err) {
       return this.sendResponse(res, {
         message: "Internal Server Error",
+        status: 500,
+      });
+    }
+  };
+
+  sharePostFacebook = async (req, res) => {
+    try {
+      const access_token = process.env.API_ACCESS_TOKEN;
+      const PAGE_ID = process.env.FACEBOOK_PAGE_ID;
+      const { message } = req.body;
+
+      const ax = await axios.post(
+        `https://graph.facebook.com/v12.0/${PAGE_ID}/feed`,
+        {
+          message: message,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      const response = await axios.get(`https://graph.facebook.com/v12.0/me`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        params: {
+          access_token: access_token,
+        },
+      });
+
+      // console.log(response.data, "get");
+      return this.sendResponse(res, {
+        message: "Message sent on Facebook successfully",
+        data: message,
+        status: 200,
+      });
+    } catch (err) {
+      return this.sendResponse(res, {
+        message: "Not Shared on Facebook!",
+        status: 500,
+      });
+    }
+  };
+
+  sharePostWhatsapp = async (req, res) => {
+    try {
+      const { phoneNumber, message } = req.body;
+
+      const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+        message
+      )}`;
+
+      res.json({ link: whatsappLink });
+    } catch (err) {
+      return this.sendResponse(res, {
+        message: "Not Shared on Whatsapp!",
         status: 500,
       });
     }
