@@ -5,5 +5,5 @@ const handler= new Comment();
 
 
 router.post('/', handler.createComment);
-
+router.get('/:id', handler.getCommentByPostId)
 module.exports={comment:router}

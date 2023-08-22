@@ -9,7 +9,7 @@ router.delete('/:id', handler.deletePostById);
 router.post('/', handler.createPost);
 router.post('/report/:id', handler.reportPost);
 router.patch('/likes',handler.postLikes);
-router.patch('/comments', handler.postComments);
+
 module.exports={posts: router};
 
 
