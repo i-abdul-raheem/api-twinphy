@@ -186,6 +186,52 @@ class Post extends Response {
       });
     }
   };
+
+  postLikes = async (req, res) => {
+    try {
+      const { user_id, post_id } = req.body;
+      const exist = await PostModel.findOne({ _id: post_id });
+      if (!exist) {
+        return this.sendResponse(res, {
+          message: "Post not found",
+          status: 404,
+        });
+      }
+      const { likes } = exist;
+      const responseBody = {};
+      if (likes.includes(user_id)) {
+        // Logic to remove user id
+        const newLikes = likes.filter((item) => item.toString() !== user_id);
+        const update = await PostModel.updateOne(
+          { _id: post_id },
+          { $set: { likes: newLikes } }
+        );
+        if (update?.modifiedCount > 0) {
+          responseBody.message = "Post disliked";
+          responseBody.status = 200;
+        } else {
+          responseBody.message = "Unable to dislike post";
+          responseBody.status = 400;
+        }
+      } else {
+        likes.push(user_id);
+        const update = await PostModel.updateOne(
+          { _id: post_id },
+          { $set: { likes } }
+        );
+        if (update?.modifiedCount > 0) {
+          responseBody.message = "Post liked";
+          responseBody.status = 200;
+        } else {
+          responseBody.message = "Unable to like post";
+          responseBody.status = 400;
+        }
+      }
+      return this.sendResponse(res, responseBody);
+    } catch (err) {
+      return this.sendResponse(res, { message: "Like not added" });
+    }
+  };
 }
 
 module.exports = { Post };
