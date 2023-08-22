@@ -150,6 +150,93 @@ class User extends Response {
       });
     }
   };
+
+  restrictUser = async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { block_user_id } = req.body;
+
+      const user = await UserModel.findOne({ _id: userId });
+
+      if (!user) {
+        return this.sendResponse(res, {
+          message: "User not found",
+          status: 404,
+        });
+      }
+
+      const { blocked } = user;
+
+      if (blocked.includes(block_user_id)) {
+        return this.sendResponse(res, {
+          message: "Already blocked this user",
+          status: 400,
+        });
+      }
+
+      blocked.push(block_user_id);
+      const blockNew = await UserModel.updateOne(
+        { _id: userId },
+        { $set: { blocked } }
+      );
+
+      return this.sendResponse(res, {
+        message: "User Updated successfully",
+        data: blocked,
+        status: 202,
+      });
+    } catch (err) {
+      return this.sendResponse(res, {
+        message: "Internal server error!",
+        data: err,
+        status: 500,
+      });
+    }
+  };
+
+  unRestrictUser = async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { block_user_id } = req.body;
+
+      const user = await UserModel.findOne({ _id: userId });
+
+      if (!user) {
+        return this.sendResponse(res, {
+          message: "User not found",
+          status: 404,
+        });
+      }
+
+      const { blocked } = user;
+
+      if (!blocked.includes(block_user_id)) {
+        return this.sendResponse(res, {
+          message: "This User is not blocked",
+          status: 400,
+        });
+      }
+
+      const updated = blocked.filter((id) => id.toString() !== block_user_id);
+
+      const blockNew = await UserModel.updateOne(
+        { _id: userId },
+        { $set: { blocked: updated } }
+      );
+
+      return this.sendResponse(res, {
+        message: "User Updated successfully",
+        data: updated,
+        status: 202,
+      });
+    } catch (err) {
+      return this.sendResponse(res, {
+        message: "Internal server error!",
+        data: err,
+        status: 500,
+      });
+    }
+  };
 }
 
 module.exports = {

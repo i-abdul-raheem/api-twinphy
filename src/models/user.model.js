@@ -58,6 +58,9 @@ const userSchema = mongoose.Schema(
     followings: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     },
+    blocked: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    },
   },
   {
     timestamps: true,
