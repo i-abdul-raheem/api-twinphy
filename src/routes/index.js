@@ -6,6 +6,7 @@ const chat = require("./chat");
 const upload = require("./file");
 const profile = require("./profile");
 const { reports } = require("./report");
+const {comment} = require("./comment");
 
 router.use("/auths", auths);
 router.use("/users", users);
@@ -14,5 +15,5 @@ router.use("/reports", reports);
 router.use("/chat", chat);
 router.use("/upload", upload);
 router.use("/profile", profile);
-
+router.use("/comment", comment);
 module.exports = { router };

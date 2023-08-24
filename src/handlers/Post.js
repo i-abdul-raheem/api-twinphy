@@ -115,7 +115,6 @@ class Post extends Response {
     try {
       const { mediaUrls, text, id } = req.body;
 
-      console.log(id);
       const user = await User.findOne({ _id: id });
 
       const newPost = new PostModel({
@@ -232,6 +231,7 @@ class Post extends Response {
       return this.sendResponse(res, { message: "Like not added" });
     }
   };
+
 }
 
 module.exports = { Post };
